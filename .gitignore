@@ -1,0 +1,5 @@
+# Ignorar directorios de configuración del IDE
+.idea/
+
+# Ignorar directorios específicos del proyecto
+ms-event-catalog-service/
