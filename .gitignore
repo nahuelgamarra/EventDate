@@ -1,5 +1,11 @@
 # Ignorar directorios de configuración del IDE
 .idea/
 
-# Ignorar directorios específicos del proyecto
-ms-event-catalog-service/
+# Ignorar archivos temporales y de configuración dentro de ms-event-catalog-service
+ms-event-catalog-service/**/*.log
+ms-event-catalog-service/**/*.tmp
+ms-event-catalog-service/*.swp
+
+# Ignorar subdirectorios temporales y de respaldo dentro de ms-event-catalog-service
+ms-event-catalog-service/tmp/
+ms-event-catalog-service/backup/
