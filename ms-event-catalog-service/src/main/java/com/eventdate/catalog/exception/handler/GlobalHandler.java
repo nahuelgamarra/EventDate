@@ -1,6 +1,7 @@
 package com.eventdate.catalog.exception.handler;
 
 import com.eventdate.catalog.exception.CategoryNotFoundException;
+import com.eventdate.catalog.exception.EventNotFoundException;
 import com.eventdate.catalog.exception.ResponseMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,11 @@ public class GlobalHandler {
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<ResponseMessage> categoryNotFoundException(CategoryNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ResponseMessage.builder().message(exception.getMessage()).build());
+    }
+    @ExceptionHandler(EventNotFoundException.class)
+    public ResponseEntity<ResponseMessage> categoryNotFoundException(EventNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ResponseMessage.builder().message(exception.getMessage()).build());
     }
 

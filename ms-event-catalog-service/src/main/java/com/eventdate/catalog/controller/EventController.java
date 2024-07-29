@@ -9,8 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
@@ -29,5 +31,11 @@ public class EventController {
     public ResponseEntity<Flux<Event>> getEventsByCategory(@PathVariable("category") String category) {
         log.info("Get events by type: {}", category);
         return new ResponseEntity<>(eventService.getEventsByCategory(category), HttpStatus.OK);
+    }
+
+    @GetMapping("/event")
+    public ResponseEntity<Mono<Event>> getEventById(@RequestParam("id") Long id) {
+        log.info("Get event by id: {}", id);
+        return new ResponseEntity<>(eventService.getEventsById(id), HttpStatus.OK);
     }
 }

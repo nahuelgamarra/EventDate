@@ -16,5 +16,5 @@ public interface EventService {
     Mono<Event> updateEvent(Long eventId, Event updatedEvent);
     Mono<Void> cancellationEvent(Long eventId);
 
-
+    Mono<Event> getEventsById(Long id);
 }

@@ -1,6 +1,7 @@
 package com.eventdate.catalog.service.impl;
 
 import com.eventdate.catalog.exception.CategoryNotFoundException;
+import com.eventdate.catalog.exception.EventNotFoundException;
 import com.eventdate.catalog.model.entity.Event;
 import com.eventdate.catalog.model.enums.Category;
 import com.eventdate.catalog.repository.EventRepository;
@@ -82,5 +83,12 @@ public class EventServiceImpl implements EventService {
     @Override
     public Mono<Void> cancellationEvent(Long eventId) {
         return null;
+    }
+
+    @Override
+    public Mono<Event> getEventsById(Long id) {
+        return eventRepository.findById(id)
+                .switchIfEmpty(Mono.error(new EventNotFoundException("Event not found for id: " + id)));
+
     }
 }
