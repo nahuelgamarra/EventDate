@@ -4,17 +4,18 @@ import com.eventdate.catalog.model.entity.Event;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+
 public interface EventService {
     Flux<Event> getEvents();
     Flux<Event> getEventsByCategory(String category);
-    Flux<Event> getEventsByDate(String date);
+    Mono<Event> getEventsById(Long id);
+    Flux<Event> getEventsByDate(LocalDate date);
     Flux<Event> getEventsByLocation(String location);
     Flux<Event> getEventsByPriceRange(double minPrice, double maxPrice);
     Flux<Event> getEventsByOrganizer(String organizer);
-    Mono<Event> getEventsBy(Long eventId);
     Mono<Event> createEvent(Event event);
     Mono<Event> updateEvent(Long eventId, Event updatedEvent);
-    Mono<Void> cancellationEvent(Long eventId);
 
-    Mono<Event> getEventsById(Long id);
+    Mono<Void> cancellationEvent(Long eventId);
 }

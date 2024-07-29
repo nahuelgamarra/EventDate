@@ -7,5 +7,8 @@ public enum Category {
     THEATER,
     EXHIBITION,
     CONFERENCE,
-    FUTBOL
+    WORKSHOP,
+    FESTIVAL,
+    FUTBOL,
+    BOOK_SIGNING
 }

@@ -13,6 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.concurrent.Delayed;
 
 @Service
@@ -45,8 +46,10 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Flux<Event> getEventsByDate(String date) {
-        return null;
+    public Flux<Event> getEventsByDate(LocalDate date) {
+
+        return eventRepository.findByDate(String.valueOf(date))
+                .switchIfEmpty(Flux.empty());
     }
 
     @Override
@@ -65,10 +68,6 @@ public class EventServiceImpl implements EventService {
         return null;
     }
 
-    @Override
-    public Mono<Event> getEventsBy(Long eventId) {
-        return null;
-    }
 
     @Override
     public Mono<Event> createEvent(Event event) {
