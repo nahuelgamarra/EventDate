@@ -16,6 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class EventController {
     public final EventService eventService;
+    private static final Pattern LOCATION_PATTERN = Pattern.compile("^[\\w\\s]+$");
 
     @GetMapping("/events")
     public ResponseEntity<Flux<Event>> getAllEvents() {
@@ -41,10 +43,20 @@ public class EventController {
         log.info("Get event by id: {}", id);
         return new ResponseEntity<>(eventService.getEventsById(id), HttpStatus.OK);
     }
+
     @GetMapping("/events/date")
     public ResponseEntity<Flux<Event>> getEventByDate(@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         log.info("Get events by date: {}", date);
-        return new ResponseEntity<>(eventService.getEventsByDate(date),HttpStatus.OK);
+        return new ResponseEntity<>(eventService.getEventsByDate(date), HttpStatus.OK);
+    }
+
+    @GetMapping("/events/location")
+    public ResponseEntity<Flux<Event>> getEventByLocation(@RequestParam("location") String location) {
+        log.info("Get events by location: {}", location);
+        if (!LOCATION_PATTERN.matcher(location).matches()) {
+            return ResponseEntity.badRequest().body(Flux.empty());
+        }
+        return new ResponseEntity<>(eventService.getEventsByLocation(location), HttpStatus.OK);
     }
 
 }

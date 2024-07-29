@@ -16,11 +16,13 @@ public class GlobalHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ResponseMessage.builder().message(exception.getMessage()).build());
     }
+
     @ExceptionHandler(EventNotFoundException.class)
     public ResponseEntity<ResponseMessage> categoryNotFoundException(EventNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ResponseMessage.builder().message(exception.getMessage()).build());
     }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ResponseMessage> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
         String message = "Invalid date format. Expected format is yyyy-MM-dd.";

@@ -14,7 +14,6 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.concurrent.Delayed;
 
 @Service
 @Slf4j
@@ -54,17 +53,12 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Flux<Event> getEventsByLocation(String location) {
-        return null;
+        return eventRepository.findByLocation(location)
+                .switchIfEmpty(Flux.empty());
     }
 
     @Override
     public Flux<Event> getEventsByPriceRange(double minPrice, double maxPrice) {
-        return null;
-    }
-
-    @Override
-    public Flux<Event> getEventsByOrganizer(String organizer) {
-
         return null;
     }
 

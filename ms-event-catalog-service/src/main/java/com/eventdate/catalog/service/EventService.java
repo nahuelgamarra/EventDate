@@ -8,13 +8,19 @@ import java.time.LocalDate;
 
 public interface EventService {
     Flux<Event> getEvents();
+
     Flux<Event> getEventsByCategory(String category);
+
     Mono<Event> getEventsById(Long id);
+
     Flux<Event> getEventsByDate(LocalDate date);
+
     Flux<Event> getEventsByLocation(String location);
+
     Flux<Event> getEventsByPriceRange(double minPrice, double maxPrice);
-    Flux<Event> getEventsByOrganizer(String organizer);
+
     Mono<Event> createEvent(Event event);
+
     Mono<Event> updateEvent(Long eventId, Event updatedEvent);
 
     Mono<Void> cancellationEvent(Long eventId);
