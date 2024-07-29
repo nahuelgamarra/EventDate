@@ -1,10 +1,11 @@
 package com.eventdate.catalog.model.enums;
 
-public enum EventType {
+public enum Category {
     SPORTS,
     CONCERT,
     MOVIE,
     THEATER,
     EXHIBITION,
-    CONFERENCE
+    CONFERENCE,
+    FUTBOL
 }

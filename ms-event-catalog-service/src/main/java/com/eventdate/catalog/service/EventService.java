@@ -6,7 +6,7 @@ import reactor.core.publisher.Mono;
 
 public interface EventService {
     Flux<Event> getEvents();
-    Flux<Event> getEventsByType(String category);
+    Flux<Event> getEventsByCategory(String category);
     Flux<Event> getEventsByDate(String date);
     Flux<Event> getEventsByLocation(String location);
     Flux<Event> getEventsByPriceRange(double minPrice, double maxPrice);

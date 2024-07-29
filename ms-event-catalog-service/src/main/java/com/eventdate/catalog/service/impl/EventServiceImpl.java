@@ -1,6 +1,8 @@
 package com.eventdate.catalog.service.impl;
 
+import com.eventdate.catalog.exception.CategoryNotFoundException;
 import com.eventdate.catalog.model.entity.Event;
+import com.eventdate.catalog.model.enums.Category;
 import com.eventdate.catalog.repository.EventRepository;
 import com.eventdate.catalog.service.EventService;
 import lombok.AllArgsConstructor;
@@ -10,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.concurrent.Delayed;
 
 @Service
 @Slf4j
@@ -23,8 +26,21 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Flux<Event> getEventsByType(String category) {
-        return null;
+    public Flux<Event> getEventsByCategory(String category) {
+        return Mono.just(category)
+                .<Category>handle((cat, sink) -> {
+                    try {
+                        sink.next(Category.valueOf(cat.toUpperCase()));
+                    } catch (IllegalArgumentException e) {
+                        sink.error(new CategoryNotFoundException("Category not found: " + category));
+                    }
+                })
+                .flatMapMany(cat -> {
+                    log.info("Searching events for category: {}", cat);
+                    return eventRepository.findByCategory(cat)
+                            .switchIfEmpty(Flux.empty());
+
+                });
     }
 
     @Override
@@ -44,6 +60,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Flux<Event> getEventsByOrganizer(String organizer) {
+
         return null;
     }
 
