@@ -5,6 +5,8 @@ import com.eventdate.catalog.exception.EventNotFoundException;
 import com.eventdate.catalog.exception.ResponseMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -28,6 +30,15 @@ public class GlobalHandler {
         String message = "Invalid date format. Expected format is yyyy-MM-dd.";
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ResponseMessage.builder().message(message).build());
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ResponseMessage> handleValidationExceptions(MethodArgumentNotValidException exception) {
+        StringBuilder message = new StringBuilder("Validation failed: ");
+        for (FieldError error : exception.getBindingResult().getFieldErrors()) {
+            message.append(error.getField()).append(" ").append(error.getDefaultMessage()).append("; ");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ResponseMessage.builder().message(message.toString()).build());
     }
 
 }

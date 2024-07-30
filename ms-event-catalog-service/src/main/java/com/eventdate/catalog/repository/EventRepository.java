@@ -15,4 +15,7 @@ public interface EventRepository extends ReactiveCrudRepository<Event, Long> {
 
     @Query("SELECT * FROM events WHERE location LIKE CONCAT('%', :location, '%')")
     Flux<Event> findByLocation(@Param("location") String location);
+
+    @Query("SELECT * FROM events WHERE price BETWEEN :minPrice AND :maxPrice")
+    Flux<Event> findByPriceRange(double minPrice, double maxPrice);
 }

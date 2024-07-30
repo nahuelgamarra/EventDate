@@ -2,11 +2,14 @@ package com.eventdate.catalog.controller;
 
 import com.eventdate.catalog.model.entity.Event;
 import com.eventdate.catalog.service.EventService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +25,7 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/api/v1")
 @AllArgsConstructor
+@Validated
 public class EventController {
     public final EventService eventService;
     private static final Pattern LOCATION_PATTERN = Pattern.compile("^[\\w\\s]+$");
@@ -57,6 +61,12 @@ public class EventController {
             return ResponseEntity.badRequest().body(Flux.empty());
         }
         return new ResponseEntity<>(eventService.getEventsByLocation(location), HttpStatus.OK);
+    }
+    @GetMapping("/events/price-range")
+    public ResponseEntity<Flux<Event>> getEventsByPriceRange (  @Valid @RequestParam("minPrice") @Min(0) double minPrice,
+                                                                @Valid @RequestParam("maxPrice") @Min(0) double maxPrice) {
+        log.info("Get events by price range: {} - {}", minPrice, maxPrice);
+        return new ResponseEntity<>(eventService.getEventsByPriceRange(minPrice, maxPrice), HttpStatus.OK);
     }
 
 }

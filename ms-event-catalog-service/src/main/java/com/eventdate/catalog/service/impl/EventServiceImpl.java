@@ -59,7 +59,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Flux<Event> getEventsByPriceRange(double minPrice, double maxPrice) {
-        return null;
+        return eventRepository.findByPriceRange(minPrice, maxPrice)
+                .switchIfEmpty(Flux.empty());
     }
 
 
