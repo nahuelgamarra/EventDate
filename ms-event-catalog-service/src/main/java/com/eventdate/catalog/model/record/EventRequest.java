@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public record EventRequest(
         @NotNull(message = "Name is required.")
@@ -28,10 +28,10 @@ public record EventRequest(
         LocalDate eventDate,
 
         @NotNull(message = "Start time is required.")
-        LocalDateTime startTime,
+        LocalTime startTime,
 
         @NotNull(message = "End time is required.")
-        LocalDateTime endTime,
+        LocalTime endTime,
 
         @NotNull(message = "Price is required.")
         @DecimalMin(value = "0.01", message = "Price must be greater than zero.")

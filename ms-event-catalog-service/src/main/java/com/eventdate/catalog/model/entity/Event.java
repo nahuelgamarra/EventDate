@@ -21,6 +21,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -49,10 +50,10 @@ public class Event implements Persistable<Long> {
     private LocalDate eventDate; // Separated date
 
     @NotNull(message = "Start time is required.")
-    private LocalDateTime startTime;
+    private LocalTime startTime;
 
     @NotNull(message = "End time is required.")
-    private LocalDateTime endTime;
+    private LocalTime  endTime;
 
     @NotNull(message = "Price is required.")
     @DecimalMin(value = "0.01", message = "Price must be greater than zero.")

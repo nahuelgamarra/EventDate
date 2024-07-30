@@ -70,14 +70,13 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Mono<Void> createEvent(@Valid EventRequest event) {
-        generateEvent(event);
-            return eventRepository.save(generateEvent(event))
-                    .doOnSuccess(e -> log.info("Created event"+ e))
-                    .doOnError(e -> {
-                        log.error("Error creating event: " + e);
-                        throw new EventCreationException("Error creating event");
-                    })
-                    .then();
+        return eventRepository.save( generateEvent(event))
+                .doOnSuccess(e -> log.info("Created event: " + e))
+                .onErrorMap(e -> {
+                    log.error("Error creating event: ", e);
+                    return new EventCreationException("Error creating event");
+                })
+                .then();
 
     }
 
