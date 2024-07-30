@@ -1,6 +1,7 @@
 package com.eventdate.catalog.controller;
 
 import com.eventdate.catalog.model.entity.Event;
+import com.eventdate.catalog.model.record.EventRequest;
 import com.eventdate.catalog.service.EventService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -12,12 +13,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 
@@ -63,10 +67,16 @@ public class EventController {
         return new ResponseEntity<>(eventService.getEventsByLocation(location), HttpStatus.OK);
     }
     @GetMapping("/events/price-range")
-    public ResponseEntity<Flux<Event>> getEventsByPriceRange (  @Valid @RequestParam("minPrice") @Min(0) double minPrice,
-                                                                @Valid @RequestParam("maxPrice") @Min(0) double maxPrice) {
+    public ResponseEntity<Flux<Event>> getEventsByPriceRange (  @Valid @RequestParam("minPrice") @Min(0) BigDecimal minPrice,
+                                                                @Valid @RequestParam("maxPrice") @Min(0) BigDecimal maxPrice) {
         log.info("Get events by price range: {} - {}", minPrice, maxPrice);
         return new ResponseEntity<>(eventService.getEventsByPriceRange(minPrice, maxPrice), HttpStatus.OK);
+    }
+    @PostMapping("/event")
+    public ResponseEntity<Mono<Void>> createEvent( @RequestBody @Valid EventRequest event) {
+        log.info("Create event: {}", event);
+
+        return new ResponseEntity<>(eventService.createEvent(event), HttpStatus.CREATED);
     }
 
 }

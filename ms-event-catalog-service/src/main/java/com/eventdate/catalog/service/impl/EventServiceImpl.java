@@ -1,17 +1,21 @@
 package com.eventdate.catalog.service.impl;
 
 import com.eventdate.catalog.exception.CategoryNotFoundException;
+import com.eventdate.catalog.exception.EventCreationException;
 import com.eventdate.catalog.exception.EventNotFoundException;
 import com.eventdate.catalog.model.entity.Event;
 import com.eventdate.catalog.model.enums.Category;
+import com.eventdate.catalog.model.record.EventRequest;
 import com.eventdate.catalog.repository.EventRepository;
 import com.eventdate.catalog.service.EventService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 
@@ -47,7 +51,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Flux<Event> getEventsByDate(LocalDate date) {
 
-        return eventRepository.findByDate(String.valueOf(date))
+        return eventRepository.findByDate(date)
                 .switchIfEmpty(Flux.empty());
     }
 
@@ -58,15 +62,42 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Flux<Event> getEventsByPriceRange(double minPrice, double maxPrice) {
+    public Flux<Event> getEventsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
         return eventRepository.findByPriceRange(minPrice, maxPrice)
                 .switchIfEmpty(Flux.empty());
     }
 
 
     @Override
-    public Mono<Event> createEvent(Event event) {
-        return null;
+    public Mono<Void> createEvent(@Valid EventRequest event) {
+        generateEvent(event);
+            return eventRepository.save(generateEvent(event))
+                    .doOnSuccess(e -> log.info("Created event"+ e))
+                    .doOnError(e -> {
+                        log.error("Error creating event: " + e);
+                        throw new EventCreationException("Error creating event");
+                    })
+                    .then();
+
+    }
+
+    private Event generateEvent(EventRequest eventRequest) {
+        return Event.builder()
+                .name(eventRequest.name())
+                .eventDate(eventRequest.eventDate())
+                .startTime(eventRequest.startTime())
+                .endTime(eventRequest.endTime())
+                .description(eventRequest.description())
+                .location(eventRequest.location())
+                .price(eventRequest.price())
+                .category(eventRequest.category())
+                .organizer(eventRequest.organizer())
+                .capacity(eventRequest.capacity())
+                .ticketAvailability(eventRequest.ticketAvailability())
+                .address(eventRequest.address())
+                .newEvent(true)
+                .active(true)
+                .build();
     }
 
     @Override

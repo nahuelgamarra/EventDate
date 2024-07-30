@@ -1,9 +1,13 @@
 package com.eventdate.catalog.service;
 
 import com.eventdate.catalog.model.entity.Event;
+import com.eventdate.catalog.model.record.EventRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public interface EventService {
@@ -17,9 +21,9 @@ public interface EventService {
 
     Flux<Event> getEventsByLocation(String location);
 
-    Flux<Event> getEventsByPriceRange(double minPrice, double maxPrice);
+    Flux<Event> getEventsByPriceRange(BigDecimal minPrice, @Valid @Min(0) BigDecimal maxPrice);
 
-    Mono<Event> createEvent(Event event);
+    Mono<Void> createEvent(@Valid EventRequest event);
 
     Mono<Event> updateEvent(Long eventId, Event updatedEvent);
 
