@@ -101,17 +101,19 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Mono<Event> updateEvent(Long eventId, Event updatedEvent) {
-        return null;
-    }
-
-    @Override
     public Mono<Void> cancellationEvent(Long eventId) {
-        return null;
+
+        return getEventById(eventId)
+                .flatMap(event -> {
+                    event.setActive(false);
+                    return eventRepository.save(event);
+                })
+               .doOnSuccess(e -> log.info("Cancelled event: " + e)).then();
+
     }
 
     @Override
-    public Mono<Event> getEventsById(Long id) {
+    public Mono<Event> getEventById(Long id) {
         return eventRepository.findById(id)
                 .switchIfEmpty(Mono.error(new EventNotFoundException("Event not found for id: " + id)));
 

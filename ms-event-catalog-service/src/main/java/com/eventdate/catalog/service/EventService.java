@@ -15,7 +15,7 @@ public interface EventService {
 
     Flux<Event> getEventsByCategory(String category);
 
-    Mono<Event> getEventsById(Long id);
+    Mono<Event> getEventById(Long id);
 
     Flux<Event> getEventsByDate(LocalDate date);
 
@@ -24,8 +24,6 @@ public interface EventService {
     Flux<Event> getEventsByPriceRange(BigDecimal minPrice, @Valid @Min(0) BigDecimal maxPrice);
 
     Mono<Void> createEvent(@Valid EventRequest event);
-
-    Mono<Event> updateEvent(Long eventId, Event updatedEvent);
 
     Mono<Void> cancellationEvent(Long eventId);
 }
