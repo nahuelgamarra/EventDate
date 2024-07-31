@@ -1,0 +1,18 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: ms-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: ms-event-catalog-service
+          uri: lb://ms-event-catalog-service
+          predicates:
+            - Path=/catalog/**
+          filters:
+            - RewritePath=/catalog/*, /
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
