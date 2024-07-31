@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: ms-event-catalog-service
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb
+    username: sa
+    password: password
+    generate-unique-name: false
+  h2:
+    console:
+      enabled: true
+
+server:
+  port: 8081
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: false
+
