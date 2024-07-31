@@ -9,3 +9,10 @@ ms-event-catalog-service/*.swp
 # Ignorar subdirectorios temporales y de respaldo dentro de ms-event-catalog-service
 ms-event-catalog-service/tmp/
 ms-event-catalog-service/backup/
+
+# Ignorar archivos y directorios específicos de ms-eureka-server
+ms-eureka-server/**/*.log
+ms-eureka-server/**/*.tmp
+ms-eureka-server/*.swp
+ms-eureka-server/tmp/
+ms-eureka-server/backup/
