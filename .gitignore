@@ -23,3 +23,10 @@ ms-gateway/**/*.tmp
 ms-gateway/*.swp
 ms-gateway/tmp/
 ms-gateway/backup/
+
+# Ignorar archivos y directorios específicos de ms-user-service
+ms-user-service/**/*.log
+ms-user-service/**/*.tmp
+ms-user-service/*.swp
+ms-user-service/tmp/
+ms-user-service/backup/
