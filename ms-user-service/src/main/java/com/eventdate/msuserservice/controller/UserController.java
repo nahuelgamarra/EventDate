@@ -1,5 +1,6 @@
 package com.eventdate.msuserservice.controller;
 
+import com.eventdate.msuserservice.model.recors.LoginDto;
 import com.eventdate.msuserservice.model.recors.UserDto;
 import com.eventdate.msuserservice.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +24,12 @@ public class UserController {
     public ResponseEntity<Mono<Void>> createUser(@RequestBody UserDto userDto) {
         log.info("Create user: {}", userDto);
         return new ResponseEntity<>(userService.registerUser(userDto), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/user/login")
+    public ResponseEntity<Mono<String>> loginUser(@RequestBody LoginDto loginDto) {
+        log.info("Login user: {}", loginDto);
+
+        return new ResponseEntity<>(userService.login(loginDto), HttpStatus.OK);
     }
 }

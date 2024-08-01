@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,10 +16,10 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    private final String SECRET_KEY = "secret_key";
+    private final SecretKey secretKey = Keys.hmacShaKeyFor("your-very-long-secret-key-that-is-at-least-32-bytes".getBytes());
 
-    private Key getKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    private SecretKey getKey() {
+        return secretKey;
     }
 
     public String generateToken(User user) {
