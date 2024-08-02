@@ -3,13 +3,16 @@ package com.eventdate.msuserservice.controller;
 import com.eventdate.msuserservice.model.recors.LoginDto;
 import com.eventdate.msuserservice.model.recors.UserDto;
 import com.eventdate.msuserservice.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -17,19 +20,27 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/v1/")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class UserController {
+
     private final UserService userService;
 
     @PostMapping("/user")
-    public ResponseEntity<Mono<Void>> createUser(@RequestBody UserDto userDto) {
+    public Mono<ResponseEntity<Void>> createUser(@RequestBody @Valid UserDto userDto) {
         log.info("Create user: {}", userDto);
-        return new ResponseEntity<>(userService.registerUser(userDto), HttpStatus.CREATED);
+//        return userService.registerUser(userDto)
+//                .then(); // Convertir Mono<Void> a Mono<Void> en caso de que registerUser devuelva un Mono<Void>
+        return userService.registerUser(userDto)
+                .map(savedUser -> new ResponseEntity<>(HttpStatus.CREATED));
     }
 
     @PostMapping("/user/login")
-    public ResponseEntity<Mono<String>> loginUser(@RequestBody LoginDto loginDto) {
+    public Mono<ResponseEntity<String>> loginUser(@RequestBody @Valid LoginDto loginDto) {
         log.info("Login user: {}", loginDto);
-
-        return new ResponseEntity<>(userService.login(loginDto), HttpStatus.OK);
+        return userService.login(loginDto)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.status(401).build());
     }
+
+
 }

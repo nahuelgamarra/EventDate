@@ -1,23 +1,3 @@
-#spring:
-#  application:
-#    name: ms-user-service
-#  r2dbc:
-#    url: r2dbc:h2:mem:///testdb
-#    username: sa
-#    password: password
-#    generate-unique-name: false
-#  h2:
-#    console:
-#      enabled: true
-#
-#server:
-#  port: 8082
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://localhost:8761/eureka/
-#    register-with-eureka: true
-#    fetch-registry: false
 spring:
   application:
     name: ms-user-service
@@ -25,17 +5,9 @@ spring:
     url: r2dbc:mysql://localhost:3306/user_reactive_db
     username: root
     password: root
-    # generate-unique-name: false (Elimina esta línea, no es necesario para MySQL)
-  mysql:
-    database:
-      name: user_reactive_db
   h2:
     console:
-      enabled: false  # Desactiva la consola H2, ya no es necesaria
-  datasource:
-    url: jdbc:mysql://localhost:3306/user_reactive_db
-    username: your_mysql_username
-    password: your_mysql_password
+      enabled: false
 
 server:
   port: 8082

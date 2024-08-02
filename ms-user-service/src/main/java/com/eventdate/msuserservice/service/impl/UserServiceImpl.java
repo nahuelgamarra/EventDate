@@ -9,12 +9,9 @@ import com.eventdate.msuserservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +43,7 @@ public class UserServiceImpl implements UserService {
                 .name(user.name())
                 .lastName(user.lastName())
                 .email(user.email())
-                .password( passwordEncoder.encode(user.password()) )
+                .password(passwordEncoder.encode(user.password()))
                 .birthday(user.birthDate())
                 .newUser(true)
                 .role("USER")
@@ -58,13 +55,12 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(login.email())
                 .flatMap(user -> {
                     if (passwordEncoder.matches(login.password(), user.getPassword())) {
-                        // Generar JWT u otro tipo de autenticación
                         return Mono.just(jwtService.generateToken(user));
                     } else {
                         return Mono.error(new BadCredentialsException("Invalid credentials"));
                     }
                 })
-                .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")));
+                .switchIfEmpty(Mono.error(new BadCredentialsException("User not found")));
     }
 
 
