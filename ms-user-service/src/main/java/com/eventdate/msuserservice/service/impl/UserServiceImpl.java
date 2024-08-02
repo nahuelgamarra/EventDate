@@ -13,6 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+import java.time.Period;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -22,15 +25,15 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Mono<Void> registerUser(UserDto user) {
-        log.info("Registering user: {}", user);
-
-        return userRepository.findByEmail(user.email())
-                .flatMap(existingUser -> {
-                    return Mono.error(new UserAlreadyExistsException("Email already registered"));
-                })
+    public Mono<Void> registerUser(UserDto newUSer) {
+        log.info("Registering newUSer: {}", newUSer);
+        if (Period.between(newUSer.birthDate(), LocalDate.now()).getYears() < 18) {
+            return Mono.error(new IllegalArgumentException("User must be at least 18 years old"));
+        }
+        return userRepository.findByEmail(newUSer.email())
+                .flatMap(existingUser -> Mono.error(new UserAlreadyExistsException("Email already registered")))
                 .switchIfEmpty(Mono.defer(() -> {
-                    User newUser = mapToUserEntity(user);
+                    User newUser = mapToUserEntity(newUSer);
                     return userRepository.save(newUser)
                             .doOnSuccess(savedUser -> log.info("User registered successfully: {}", savedUser))
                             .then();

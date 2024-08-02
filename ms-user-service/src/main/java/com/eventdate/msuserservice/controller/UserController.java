@@ -28,10 +28,8 @@ public class UserController {
     @PostMapping("/user")
     public Mono<ResponseEntity<Void>> createUser(@RequestBody @Valid UserDto userDto) {
         log.info("Create user: {}", userDto);
-//        return userService.registerUser(userDto)
-//                .then(); // Convertir Mono<Void> a Mono<Void> en caso de que registerUser devuelva un Mono<Void>
         return userService.registerUser(userDto)
-                .map(savedUser -> new ResponseEntity<>(HttpStatus.CREATED));
+                .then(Mono.fromCallable(() -> new ResponseEntity<>(HttpStatus.CREATED)));
     }
 
     @PostMapping("/user/login")
