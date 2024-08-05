@@ -12,12 +12,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 @Slf4j
 @Validated
@@ -25,14 +24,14 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/user")
-    public Mono<ResponseEntity<Void>> createUser(@RequestBody @Valid UserDto userDto) {
+    @PostMapping("/register")
+    public Mono<ResponseEntity<Void>> register(@RequestBody @Valid UserDto userDto) {
         log.info("Create user: {}", userDto);
         return userService.registerUser(userDto)
                 .then(Mono.fromCallable(() -> new ResponseEntity<>(HttpStatus.CREATED)));
     }
 
-    @PostMapping("/user/login")
+    @PostMapping("/login")
     public Mono<ResponseEntity<String>> loginUser(@RequestBody @Valid LoginDto loginDto) {
         log.info("Login user: {}", loginDto);
         return userService.login(loginDto)
