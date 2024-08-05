@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/")
 @AllArgsConstructor
 @Validated
 public class EventController {
@@ -75,8 +75,9 @@ public class EventController {
         return new ResponseEntity<>(eventService.getEventsByPriceRange(minPrice, maxPrice), HttpStatus.OK);
     }
 
+
     @PostMapping("/event")
-    public ResponseEntity<Mono<Void>> createEvent(@RequestBody @Valid EventRequest event) {
+    public ResponseEntity<Mono<Void>> registerEvent(@RequestBody @Valid EventRequest event) {
         log.info("Create event: {}", event);
 
         return new ResponseEntity<>(eventService.createEvent(event), HttpStatus.CREATED);

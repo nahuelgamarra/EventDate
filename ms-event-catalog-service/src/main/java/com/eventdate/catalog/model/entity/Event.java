@@ -12,15 +12,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
@@ -30,7 +29,7 @@ import java.time.LocalTime;
 @Builder
 @ToString
 @Table(value = "events")
-public class Event implements Persistable<Long> {
+public class Event implements   Persistable<Long> {
     @Id
     private Long id;
 
@@ -53,7 +52,7 @@ public class Event implements Persistable<Long> {
     private LocalTime startTime;
 
     @NotNull(message = "End time is required.")
-    private LocalTime  endTime;
+    private LocalTime endTime;
 
     @NotNull(message = "Price is required.")
     @DecimalMin(value = "0.01", message = "Price must be greater than zero.")

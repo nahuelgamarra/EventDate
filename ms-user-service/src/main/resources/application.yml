@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: ms-user-service
+  r2dbc:
+    url: r2dbc:mysql://localhost:3306/user_reactive_db
+    username: root
+    password: root
+  h2:
+    console:
+      enabled: false
+
+server:
+  port: 8082
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: false
