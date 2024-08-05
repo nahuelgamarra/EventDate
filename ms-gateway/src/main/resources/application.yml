@@ -11,7 +11,13 @@ spring:
           predicates:
             - Path=/catalog/**
           filters:
-            - RewritePath=/catalog/*, /
+            - RewritePath=/catalog/(?<segment>.*), /api/v1/$\{segment}
+        - id: user-service
+          uri: lb://ms-user-service
+          predicates:
+            - Path=/user/**
+          filters:
+            - RewritePath=/user/(?<segment>.*), /api/v1/user/$\{segment}
 eureka:
   client:
     service-url:
