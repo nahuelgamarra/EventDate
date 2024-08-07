@@ -1,4 +1,4 @@
-package com.eventdate.msreservationservice.model;
+package com.eventdate.msreservationservice.model.entity;
 
 import com.eventdate.msreservationservice.model.enums.StatusOfReservation;
 import lombok.AllArgsConstructor;
