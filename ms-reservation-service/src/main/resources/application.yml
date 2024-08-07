@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: ms-reservation-service
+  r2dbc:
+    url: r2dbc:mysql://localhost:3306/reservation_reactive_db
+    username: root
+    password: root
+  h2:
+    console:
+      enabled: false
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: false
