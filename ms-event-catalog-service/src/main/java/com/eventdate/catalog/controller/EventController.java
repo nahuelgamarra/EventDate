@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/catalog")
 @AllArgsConstructor
 @Validated
 public class EventController {
