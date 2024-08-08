@@ -9,15 +9,15 @@ spring:
         - id: ms-event-catalog-service
           uri: lb://ms-event-catalog-service
           predicates:
-            - Path=/catalog/**
-          filters:
-            - RewritePath=/catalog/(?<segment>.*), /api/v1/$\{segment}
-        - id: user-service
+            - Path=/api/v1/catalog/**
+        - id: ms-user-service
           uri: lb://ms-user-service
           predicates:
-            - Path=/user/**
-          filters:
-            - RewritePath=/user/(?<segment>.*), /api/v1/user/$\{segment}
+            - Path=/api/v1/user/**
+        - id: ms-reservation-service
+          uri: lb://ms-reservation-service
+          predicates:
+            - Path=/api/v1/reservation/**
 eureka:
   client:
     service-url:
