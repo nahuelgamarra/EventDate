@@ -20,7 +20,7 @@ public class GatewayConfig {
                         .uri("lb://ms-event-catalog-service")
                 )
                 .route(p -> p
-                        .path("/api/v1/user/**")
+                        .path("/api/v1/auth/**")
                         .uri("lb://ms-user-service")
                 )
                 .route(p -> p
