@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 
 public interface ReservationService {
     Mono<Reservation> getById(Long id);
-    Mono<Reservation> create(ReservationRequest reservation);
+    Mono<Reservation> create(ReservationRequest reservation, String token);
     Mono<Void> update(Reservation reservation);
     Mono<Void> cancelReservation(Long id);
     Flux<Reservation> getReservationsByUserId(Long idUserId);

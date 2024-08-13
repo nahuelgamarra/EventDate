@@ -1,6 +1,6 @@
 package com.eventdate.msreservationservice.model.records;
 
-public record ReservationRequest(Long userId,
+public record ReservationRequest(
                                  Long eventId,
                                  int numberOfTickets) {
 }
