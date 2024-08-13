@@ -18,6 +18,12 @@ public class GatewayConfig {
                 .route(p -> p
                         .path("/api/v1/catalog/**")
                         .uri("lb://ms-event-catalog-service")
+
+                )
+                .route(p -> p
+                        .path("/api/v1/tickets/**")
+                        .filters(f -> f.filter(authenticationFilter))
+                        .uri("lb://ms-event-catalog-service")
                 )
                 .route(p -> p
                         .path("/api/v1/auth/**")
