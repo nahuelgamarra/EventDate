@@ -1,5 +1,6 @@
 package com.eventdate.msreservationservice.service.impl;
 
+import com.eventdate.msreservationservice.exception.ReservationCreationException;
 import com.eventdate.msreservationservice.model.entity.Reservation;
 import com.eventdate.msreservationservice.model.enums.StatusOfReservation;
 import com.eventdate.msreservationservice.model.records.ReservationRequest;
@@ -30,28 +31,11 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public Mono<Reservation> create(ReservationRequest reservation, String token) {
-        // TODO teniendo en cuenta que esta peticion viene del gateway y ya se sabe que es de un usuario verificado
-        // TODO hay que verificar la disponibilidad de la cantidad de entradas
-        // TODO que el eventId sea valido
-        // TODO que no haya pasado la fecha y demas validaciones que se tienen que consultar a otro microservicio
-        // TODO
-        // TODO
-        //return reservationRepository.save(convertToEntity(reservation));
-//        return checkEventAvailability(reservation.eventId(), reservation.numberOfTickets(), token)
-//                .flatMap(isAvailable -> {
-//                    if (!isAvailable) {
-//                        return Mono.error(new RuntimeException("Not available"));
-//                    }
-//                    return reservationRepository.save(convertToEntity(reservation, token));
-//                });
-
-
         return checkEventAvailability(reservation.eventId(), reservation.numberOfTickets(), token)
                 .flatMap(isAvailable -> {
-                    if (!isAvailable) {
-                        return Mono.error(new RuntimeException("Not available"));
-                    }
-                    return convertToEntity(reservation, token) // Este método ahora devuelve un Mono<Reservation>
+                    if (!isAvailable)
+                        throw new ReservationCreationException("Not available");
+                    return convertToEntity(reservation, token)
                             .flatMap(reservationRepository::save);
                 });
     }

@@ -36,8 +36,8 @@ public class ReservationController {
 
 
     @PostMapping
-    public Mono<ResponseEntity<Reservation>> createReservation(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String request, @RequestBody @Valid ReservationRequest reservation) {
-        log.debug("createReservation {}", reservation);
+    public Mono<ResponseEntity<Reservation>> createReservation(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String request,
+                                                               @RequestBody @Valid ReservationRequest reservation) {
         return reservationService.create(reservation, request)
                 .map(reservationResponse -> new ResponseEntity<>(reservationResponse, HttpStatus.CREATED))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
