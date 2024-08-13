@@ -83,11 +83,4 @@ public class EventController {
         return new ResponseEntity<>(eventService.createEvent(event), HttpStatus.CREATED);
     }
 
-    @PatchMapping("/event/{id}/cancel")
-    public ResponseEntity<Mono<Void>> cancelEvent(@PathVariable Long id) {
-        log.info("Cancel event: {}", id);
-        return new ResponseEntity<>(eventService.cancellationEvent(id), HttpStatus.NO_CONTENT);
-    }
-
-
 }

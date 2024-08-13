@@ -12,10 +12,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
@@ -29,7 +29,7 @@ import java.time.LocalTime;
 @Builder
 @ToString
 @Table(value = "events")
-public class Event implements   Persistable<Long> {
+public class Event implements Persistable<Long> {
     @Id
     private Long id;
 
@@ -74,6 +74,8 @@ public class Event implements   Persistable<Long> {
     @NotEmpty(message = "Address is required.")
     @Size(max = 255, message = "Address must not exceed 255 characters.")
     private String address;
+    @Column(value = "tickets_sold")
+    private Integer ticketsSold;
 
     @Transient
     private boolean newEvent;

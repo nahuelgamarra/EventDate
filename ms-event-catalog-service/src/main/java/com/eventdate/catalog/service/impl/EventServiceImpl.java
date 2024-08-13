@@ -70,7 +70,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Mono<Void> createEvent(@Valid EventRequest event) {
-        return eventRepository.save( generateEvent(event))
+        return eventRepository.save(generateEvent(event))
                 .doOnSuccess(e -> log.info("Created event: " + e))
                 .onErrorMap(e -> {
                     log.error("Error creating event: ", e);
@@ -107,7 +107,7 @@ public class EventServiceImpl implements EventService {
                     event.setActive(false);
                     return eventRepository.save(event);
                 })
-               .doOnSuccess(e -> log.info("Cancelled event: " + e)).then();
+                .doOnSuccess(e -> log.info("Cancelled event: " + e)).then();
 
     }
 
@@ -116,5 +116,20 @@ public class EventServiceImpl implements EventService {
         return eventRepository.findById(id)
                 .switchIfEmpty(Mono.error(new EventNotFoundException("Event not found for id: " + id)));
 
+    }
+
+    @Override
+    public Mono<Boolean> buyTickets(Long eventId, int numberOfTickets) {
+        return getEventById(eventId)
+                .flatMap(event -> {
+                    if (event.getTicketsSold() + numberOfTickets <= event.getCapacity()) {
+                        event.setTicketsSold(event.getTicketsSold() + numberOfTickets);
+                        return eventRepository.save(event)
+                                .thenReturn(true);
+                    } else {
+                        return Mono.error(new RuntimeException("Not enough tickets available for event ID: " + eventId));
+                    }
+                })
+                .doOnError(e -> log.error("Error buying tickets: ", e));
     }
 }

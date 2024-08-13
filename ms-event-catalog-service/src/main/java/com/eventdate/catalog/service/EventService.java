@@ -26,4 +26,6 @@ public interface EventService {
     Mono<Void> createEvent(@Valid EventRequest event);
 
     Mono<Void> cancellationEvent(Long eventId);
+
+    Mono<Boolean> buyTickets(Long reservationId, int numberOfTickets);
 }
