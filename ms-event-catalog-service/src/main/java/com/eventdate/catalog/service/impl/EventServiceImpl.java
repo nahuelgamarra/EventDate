@@ -6,11 +6,14 @@ import com.eventdate.catalog.exception.EventNotFoundException;
 import com.eventdate.catalog.model.entity.Event;
 import com.eventdate.catalog.model.enums.Category;
 import com.eventdate.catalog.model.record.EventRequest;
+import com.eventdate.catalog.model.record.ReservationPending;
 import com.eventdate.catalog.repository.EventRepository;
 import com.eventdate.catalog.service.EventService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,6 +26,7 @@ import java.time.LocalDate;
 @Slf4j
 @AllArgsConstructor
 public class EventServiceImpl implements EventService {
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final EventRepository eventRepository;
 
     @Override
@@ -118,18 +122,22 @@ public class EventServiceImpl implements EventService {
 
     }
 
+
+    @KafkaListener(topics = "event-reservation", groupId = "myGroup1")
     @Override
-    public Mono<Boolean> buyTickets(Long eventId, int numberOfTickets) {
-        return getEventById(eventId)
+    public Mono<Void> buyTickets(ReservationPending reservationPending) {
+        return getEventById(reservationPending.eventId())
                 .flatMap(event -> {
-                    if (event.getTicketsSold() + numberOfTickets <= event.getCapacity()) {
-                        event.setTicketsSold(event.getTicketsSold() + numberOfTickets);
+                    if (event.getTicketsSold() + reservationPending.numberOfTickets() <= event.getCapacity()) {
+                        event.setTicketsSold(event.getTicketsSold() + reservationPending.numberOfTickets());
                         return eventRepository.save(event)
-                                .thenReturn(true);
+                                .doOnSuccess(e -> kafkaTemplate.send("reservation-confirmed", reservationPending.reservationId()))
+                                .then();
                     } else {
-                        return Mono.error(new RuntimeException("Not enough tickets available for event ID: " + eventId));
+                        return Mono.error(new RuntimeException("Not enough tickets available for event ID: " + reservationPending.eventId()));
                     }
                 })
-                .doOnError(e -> log.error("Error buying tickets: ", e));
+                .doOnError(e -> log.error("Error buying tickets: ", e))
+                .then();
     }
 }

@@ -2,6 +2,7 @@ package com.eventdate.catalog.service;
 
 import com.eventdate.catalog.model.entity.Event;
 import com.eventdate.catalog.model.record.EventRequest;
+import com.eventdate.catalog.model.record.ReservationPending;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import reactor.core.publisher.Flux;
@@ -27,5 +28,5 @@ public interface EventService {
 
     Mono<Void> cancellationEvent(Long eventId);
 
-    Mono<Boolean> buyTickets(Long reservationId, int numberOfTickets);
+    Mono<Void> buyTickets(ReservationPending request);
 }
