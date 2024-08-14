@@ -1,6 +1,5 @@
 package com.eventdate.msreservationservice.service.impl;
 
-import com.eventdate.msreservationservice.exception.ReservationCreationException;
 import com.eventdate.msreservationservice.model.entity.Reservation;
 import com.eventdate.msreservationservice.model.enums.StatusOfReservation;
 import com.eventdate.msreservationservice.model.records.ReservationRequest;
@@ -9,6 +8,7 @@ import com.eventdate.msreservationservice.service.ReservationService;
 import com.eventdate.msreservationservice.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -24,20 +24,21 @@ public class ReservationServiceImpl implements ReservationService {
     private final WebClient.Builder webClientBuilder;
     private final JwtUtils jwtUtils;
 
+    private final KafkaTemplate<String, ReservationRequest> kafkaTemplate;
+
+
     @Override
     public Mono<Reservation> getById(Long id) {
         return null;
     }
 
     @Override
-    public Mono<Reservation> create(ReservationRequest reservation, String token) {
-        return checkEventAvailability(reservation.eventId(), reservation.numberOfTickets(), token)
-                .flatMap(isAvailable -> {
-                    if (!isAvailable)
-                        throw new ReservationCreationException("Not available");
-                    return convertToEntity(reservation, token)
-                            .flatMap(reservationRepository::save);
-                });
+    public Mono<Reservation> create(ReservationRequest reservationRequest, String token) {
+        return convertToEntity(reservationRequest, token)
+                .flatMap(reservationEntity -> reservationRepository.save(reservationEntity)
+                        .doOnSuccess(savedReservation -> kafkaTemplate.send("reservation-events", reservationRequest)
+                        )
+                );
     }
 
 
