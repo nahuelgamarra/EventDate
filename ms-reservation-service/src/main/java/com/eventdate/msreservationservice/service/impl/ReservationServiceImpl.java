@@ -1,13 +1,16 @@
 package com.eventdate.msreservationservice.service.impl;
 
+import com.eventdate.msreservationservice.exception.ReservationNotFoundException;
 import com.eventdate.msreservationservice.model.entity.Reservation;
 import com.eventdate.msreservationservice.model.enums.StatusOfReservation;
+import com.eventdate.msreservationservice.model.records.ReservationPending;
 import com.eventdate.msreservationservice.model.records.ReservationRequest;
 import com.eventdate.msreservationservice.repository.ReservationRepository;
 import com.eventdate.msreservationservice.service.ReservationService;
 import com.eventdate.msreservationservice.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -24,36 +27,28 @@ public class ReservationServiceImpl implements ReservationService {
     private final WebClient.Builder webClientBuilder;
     private final JwtUtils jwtUtils;
 
-    private final KafkaTemplate<String, ReservationRequest> kafkaTemplate;
+    private final KafkaTemplate<String, ReservationPending> kafkaTemplate;
 
 
     @Override
     public Mono<Reservation> getById(Long id) {
-        return null;
+        return reservationRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ReservationNotFoundException("Reservation not found")));
     }
 
     @Override
     public Mono<Reservation> create(ReservationRequest reservationRequest, String token) {
         return convertToEntity(reservationRequest, token)
                 .flatMap(reservationEntity -> reservationRepository.save(reservationEntity)
-                        .doOnSuccess(savedReservation -> kafkaTemplate.send("reservation-events", reservationRequest)
+                        .doOnSuccess(savedReservation -> {
+                                    ReservationPending reservationPending = new ReservationPending(savedReservation.getId(),
+                                            reservationRequest.eventId(),
+                                            reservationRequest.numberOfTickets()
+                                    );
+                                    kafkaTemplate.send("event-reservation", reservationPending);
+                                }
                         )
                 );
-    }
-
-
-    private Mono<Boolean> checkEventAvailability(Long eventId, int numberOfTickets, String token) {
-
-        return webClientBuilder.build()
-                .post()
-                .uri("http://localhost:8080/api/v1/tickets/events/{eventId}/buy?numberOfTickets={numberOfTickets}", eventId, numberOfTickets)
-                .header("Authorization", token)
-                .retrieve()
-                .bodyToMono(Boolean.class)
-                .onErrorResume(e -> {
-                    log.error("Error checking availability for event {}, {}", eventId, e.getMessage());
-                    return Mono.just(false);
-                });
     }
 
     private Mono<Reservation> convertToEntity(ReservationRequest request, String jwt) {
@@ -67,6 +62,19 @@ public class ReservationServiceImpl implements ReservationService {
                         .status(StatusOfReservation.PENDING)
                         .build());
     }
+
+    @KafkaListener(topics = "reservation-confirmed", groupId = "reservation-confirmed")
+    public void confirmReservation(Long reservationId) {
+        getById(reservationId)
+                .flatMap(reservation -> {
+                    reservation.setStatus(StatusOfReservation.CONFIRMED);
+                    return reservationRepository.save(reservation)
+                            .doOnSuccess(savedReservation -> log.info("Reservation confirmed: {}", savedReservation))
+                            .doOnError(error -> log.error("Error confirming reservation: ", error));
+                })
+                .subscribe();
+    }
+
 
     @Override
     public Mono<Void> update(Reservation reservation) {
