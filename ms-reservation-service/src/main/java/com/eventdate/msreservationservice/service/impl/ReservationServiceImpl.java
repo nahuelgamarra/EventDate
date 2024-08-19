@@ -19,6 +19,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Service
@@ -136,7 +137,7 @@ public class ReservationServiceImpl implements ReservationService {
                 eventInfo.startTime(),
                 eventInfo.endTime(),
                 reservation.getNumberOfTickets(),
-                eventInfo.price()
+                (eventInfo.price().multiply(BigDecimal.valueOf(reservation.getNumberOfTickets())))
         );
     }
 }
