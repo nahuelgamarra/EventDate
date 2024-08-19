@@ -77,6 +77,18 @@ public class ReservationServiceImpl implements ReservationService {
                 .subscribe();
     }
 
+    @KafkaListener(topics = "reservation-rejected", groupId = "reservation-rejected")
+    public void rejectReservation(Long reservationId) {
+        getById(reservationId)
+                .flatMap(reservation -> {
+                    reservation.setStatus(StatusOfReservation.REJECTED);
+                    return reservationRepository.save(reservation)
+                            .doOnSuccess(savedReservation -> log.info("Reservation rejected: {}", savedReservation))
+                            .doOnError(error -> log.error("Error confirming reservation: ", error));
+                })
+                .subscribe();
+    }
+
 
     @Override
     public Mono<Void> update(Reservation reservation) {
@@ -91,7 +103,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public Flux<Reservation> getReservationsByUserId( String token) {
         return jwtUtils.getUserId(token)
-                .flatMapMany(userId -> reservationRepository.findReservationByUserId(userId))
+                .flatMapMany(reservationRepository::findReservationByUserId)
                 .onErrorResume(e -> {
                     log.error("Error fetching reservations", e);
                     return Flux.empty(); // Return an empty Flux in case of error
@@ -104,8 +116,6 @@ public class ReservationServiceImpl implements ReservationService {
         return getById(reservationId)
                 .flatMap(reservation -> {
                     if (reservation.getStatus().equals(StatusOfReservation.CONFIRMED)) {
-                        log.info("que tiene el reservation id {}", reservationId);
-                        log.info("es de este user  {}", reservation.getUserId());
                         return webClientBuilder.build()
                                 .get()
                                 .uri("http://ms-event-catalog-service/api/v1/catalog/event?id={id}", reservation.getEventId())
@@ -118,13 +128,11 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private TicketInfo createTicketInfo(Reservation reservation, EventInfo eventInfo) {
-        log.info("crea ticket info para reservation id {}", reservation.toString());
-        log.info("crea ticket info para evento id {}", eventInfo.toString());
         return new TicketInfo(
                 reservation.getId(),
                 eventInfo.id(),
                 eventInfo.name(),
-                eventInfo.date(),
+                eventInfo.eventDate(),
                 eventInfo.startTime(),
                 eventInfo.endTime(),
                 reservation.getNumberOfTickets(),

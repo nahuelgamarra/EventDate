@@ -46,7 +46,7 @@ public class Event implements Persistable<Long> {
     private String location;
 
     @NotNull(message = "Date is required.")
-    private LocalDate eventDate; // Separated date
+    private LocalDate eventDate;
 
     @NotNull(message = "Start time is required.")
     private LocalTime startTime;

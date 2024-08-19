@@ -134,6 +134,7 @@ public class EventServiceImpl implements EventService {
                                 .doOnSuccess(e -> kafkaTemplate.send("reservation-confirmed", reservationPending.reservationId()))
                                 .then();
                     } else {
+                        kafkaTemplate.send("reservation-rejected", reservationPending.reservationId());
                         return Mono.error(new RuntimeException("Not enough tickets available for event ID: " + reservationPending.eventId()));
                     }
                 })

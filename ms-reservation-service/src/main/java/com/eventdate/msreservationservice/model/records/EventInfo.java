@@ -8,7 +8,7 @@ public record EventInfo(
         Long id,
         String name,
         String location,
-        LocalDate date,
+        LocalDate eventDate,
         LocalTime startTime,
         LocalTime endTime,
         BigDecimal price
