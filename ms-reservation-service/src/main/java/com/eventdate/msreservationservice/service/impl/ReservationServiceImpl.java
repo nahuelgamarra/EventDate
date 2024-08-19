@@ -3,8 +3,10 @@ package com.eventdate.msreservationservice.service.impl;
 import com.eventdate.msreservationservice.exception.ReservationNotFoundException;
 import com.eventdate.msreservationservice.model.entity.Reservation;
 import com.eventdate.msreservationservice.model.enums.StatusOfReservation;
+import com.eventdate.msreservationservice.model.records.EventInfo;
 import com.eventdate.msreservationservice.model.records.ReservationPending;
 import com.eventdate.msreservationservice.model.records.ReservationRequest;
+import com.eventdate.msreservationservice.model.records.TicketInfo;
 import com.eventdate.msreservationservice.repository.ReservationRepository;
 import com.eventdate.msreservationservice.service.ReservationService;
 import com.eventdate.msreservationservice.utils.JwtUtils;
@@ -87,8 +89,46 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Flux<Reservation> getReservationsByUserId(Long idUserId) {
-        log.info("search by user {}", idUserId);
-        return reservationRepository.findReservationByUserId(idUserId);
+    public Flux<Reservation> getReservationsByUserId( String token) {
+        return jwtUtils.getUserId(token)
+                .flatMapMany(userId -> reservationRepository.findReservationByUserId(userId))
+                .onErrorResume(e -> {
+                    log.error("Error fetching reservations", e);
+                    return Flux.empty(); // Return an empty Flux in case of error
+                });
+
+    }
+
+    @Override
+    public Mono<TicketInfo> getTicketInfo(Long reservationId) {
+        return getById(reservationId)
+                .flatMap(reservation -> {
+                    if (reservation.getStatus().equals(StatusOfReservation.CONFIRMED)) {
+                        log.info("que tiene el reservation id {}", reservationId);
+                        log.info("es de este user  {}", reservation.getUserId());
+                        return webClientBuilder.build()
+                                .get()
+                                .uri("http://ms-event-catalog-service/api/v1/catalog/event?id={id}", reservation.getEventId())
+                                .retrieve()
+                                .bodyToMono(EventInfo.class)
+                                .mapNotNull(eventInfo -> createTicketInfo(reservation, eventInfo));
+                    }
+                    return Mono.just(null);
+                });
+    }
+
+    private TicketInfo createTicketInfo(Reservation reservation, EventInfo eventInfo) {
+        log.info("crea ticket info para reservation id {}", reservation.toString());
+        log.info("crea ticket info para evento id {}", eventInfo.toString());
+        return new TicketInfo(
+                reservation.getId(),
+                eventInfo.id(),
+                eventInfo.name(),
+                eventInfo.date(),
+                eventInfo.startTime(),
+                eventInfo.endTime(),
+                reservation.getNumberOfTickets(),
+                eventInfo.price()
+        );
     }
 }

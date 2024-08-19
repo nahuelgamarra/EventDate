@@ -2,6 +2,7 @@ package com.eventdate.msreservationservice.controller;
 
 import com.eventdate.msreservationservice.model.entity.Reservation;
 import com.eventdate.msreservationservice.model.records.ReservationRequest;
+import com.eventdate.msreservationservice.model.records.TicketInfo;
 import com.eventdate.msreservationservice.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +28,10 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-    @GetMapping("/user/{userId}")
-    public Flux<Reservation> getAllReservationsByUser(@PathVariable Long userId) {
-        log.info("getAllReservationsByUser userId={}", userId);
-        return reservationService.getReservationsByUserId(userId)
+    @GetMapping("/user")
+    public Flux<Reservation> getAllReservationsByUser(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String token) {
+        log.info("getAllReservationsByUser userId");
+        return reservationService.getReservationsByUserId(token)
                 .switchIfEmpty(Flux.empty());
     }
 
@@ -41,6 +42,14 @@ public class ReservationController {
         return reservationService.create(reservation, request)
                 .map(reservationResponse -> new ResponseEntity<>(reservationResponse, HttpStatus.CREATED))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+    }
+
+    @GetMapping("/tickets/{reservationId}")
+    public Mono<ResponseEntity<TicketInfo>> getTickets(@PathVariable Long reservationId) {
+        log.info("Get tickets for reservation {}", reservationId);
+        return reservationService.getTicketInfo(reservationId)
+                .map(ticketInfo -> new ResponseEntity<>(ticketInfo, HttpStatus.OK))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }
 
