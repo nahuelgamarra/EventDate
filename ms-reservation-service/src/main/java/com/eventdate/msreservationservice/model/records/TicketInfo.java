@@ -6,7 +6,6 @@ import java.time.LocalTime;
 
 public record TicketInfo(
         Long reservationId,
-        Long eventId,
         String eventName,
         LocalDate eventDate,
         LocalTime eventStartTime,

@@ -1,4 +1,4 @@
-package com.eventdate.catalog.model.record;
+package com.eventdate.catalog.model.dto;
 
 import com.eventdate.catalog.model.enums.Category;
 import jakarta.validation.constraints.DecimalMin;
