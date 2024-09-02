@@ -1,7 +1,8 @@
 package com.eventdate.catalog.controller;
 
+import com.eventdate.catalog.model.dto.EventRequest;
+import com.eventdate.catalog.model.dto.EventResponse;
 import com.eventdate.catalog.model.entity.Event;
-import com.eventdate.catalog.model.record.EventRequest;
 import com.eventdate.catalog.service.EventService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -12,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,12 +23,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/catalog")
 @AllArgsConstructor
 @Validated
 public class EventController {
@@ -36,36 +37,37 @@ public class EventController {
     private static final Pattern LOCATION_PATTERN = Pattern.compile("^[\\w\\s]+$");
 
     @GetMapping("/events")
-    public ResponseEntity<Flux<Event>> getAllEvents() {
-        log.info("Get all events");
-        return new ResponseEntity<>(eventService.getEvents(), HttpStatus.OK);
+    public Flux<EventResponse> getAllEvents() {
+        return eventService.getEvents()
+                .doOnNext(event -> log.info("Event: {}", event));
     }
 
     @GetMapping("/events/category/{category}")
-    public ResponseEntity<Flux<Event>> getEventsByCategory(@PathVariable("category") String category) {
-        log.info("Get events by type: {}", category);
-        return new ResponseEntity<>(eventService.getEventsByCategory(category), HttpStatus.OK);
+    public Flux<EventResponse> getEventsByCategory(@PathVariable("category") String category) {
+        log.info("Get events by category: {}", category);
+        return eventService.getEventsByCategory(category)
+                .doOnNext(event -> log.info("Event: {}", event));
     }
 
+
+
+
     @GetMapping("/event")
-    public ResponseEntity<Mono<Event>> getEventById(@RequestParam("id") Long id) {
+    public Mono<EventResponse> getEventById(@RequestParam("id") Long id) {
         log.info("Get event by id: {}", id);
-        return new ResponseEntity<>(eventService.getEventById(id), HttpStatus.OK);
+        return eventService.getEventById(id);
     }
 
     @GetMapping("/events/date")
-    public ResponseEntity<Flux<Event>> getEventByDate(@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+    public Flux<EventResponse> getEventByDate(@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         log.info("Get events by date: {}", date);
-        return new ResponseEntity<>(eventService.getEventsByDate(date), HttpStatus.OK);
+        return eventService.getEventsByDate(date);
     }
 
     @GetMapping("/events/location")
-    public ResponseEntity<Flux<Event>> getEventByLocation(@RequestParam("location") String location) {
+    public Flux<EventResponse>getEventByLocation(@RequestParam("location") String location) {
         log.info("Get events by location: {}", location);
-        if (!LOCATION_PATTERN.matcher(location).matches()) {
-            return ResponseEntity.badRequest().body(Flux.empty());
-        }
-        return new ResponseEntity<>(eventService.getEventsByLocation(location), HttpStatus.OK);
+        return eventService.getEventsByLocation(location);
     }
 
     @GetMapping("/events/price-range")
@@ -82,12 +84,5 @@ public class EventController {
 
         return new ResponseEntity<>(eventService.createEvent(event), HttpStatus.CREATED);
     }
-
-    @PatchMapping("/event/{id}/cancel")
-    public ResponseEntity<Mono<Void>> cancelEvent(@PathVariable Long id) {
-        log.info("Cancel event: {}", id);
-        return new ResponseEntity<>(eventService.cancellationEvent(id), HttpStatus.NO_CONTENT);
-    }
-
 
 }

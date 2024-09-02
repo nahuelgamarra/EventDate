@@ -2,6 +2,7 @@ package com.eventdate.msuserservice.service.impl;
 
 import com.eventdate.msuserservice.exception.UserAlreadyExistsException;
 import com.eventdate.msuserservice.model.entity.User;
+import com.eventdate.msuserservice.model.enums.UserRole;
 import com.eventdate.msuserservice.model.recors.LoginDto;
 import com.eventdate.msuserservice.model.recors.UserDto;
 import com.eventdate.msuserservice.repository.UserRepository;
@@ -49,7 +50,7 @@ public class UserServiceImpl implements UserService {
                 .password(passwordEncoder.encode(user.password()))
                 .birthday(user.birthDate())
                 .newUser(true)
-                .role("USER")
+                .role(UserRole.USER)
                 .build();
     }
 

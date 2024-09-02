@@ -30,3 +30,10 @@ ms-user-service/**/*.tmp
 ms-user-service/*.swp
 ms-user-service/tmp/
 ms-user-service/backup/
+
+# Ignorar archivos y directorios específicos de ms-reservation-service
+ms-reservation-service/**/*.log
+ms-reservation-service/**/*.tmp
+ms-reservation-service/*.swp
+ms-reservation-service/tmp/
+ms-reservation-service/backup/

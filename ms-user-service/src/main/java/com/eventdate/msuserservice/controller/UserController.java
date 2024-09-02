@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Slf4j
 @Validated
@@ -33,11 +33,13 @@ public class UserController {
 
     @PostMapping("/login")
     public Mono<ResponseEntity<String>> loginUser(@RequestBody @Valid LoginDto loginDto) {
-        log.info("Login user: {}", loginDto);
+        log.info("Login user");
         return userService.login(loginDto)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.status(401).build());
     }
+
+
 
 
 }

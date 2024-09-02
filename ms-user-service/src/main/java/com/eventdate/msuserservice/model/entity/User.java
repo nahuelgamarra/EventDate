@@ -1,5 +1,6 @@
 package com.eventdate.msuserservice.model.entity;
 
+import com.eventdate.msuserservice.model.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,8 +36,8 @@ public class User implements Persistable<Long>, UserDetails {
     private String email;
     private String password;
     private LocalDate birthday;
-
-    private String role;
+    @Column(value = "role")
+    private UserRole role;
     @Transient
     private boolean newUser;
 
@@ -47,7 +48,7 @@ public class User implements Persistable<Long>, UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
