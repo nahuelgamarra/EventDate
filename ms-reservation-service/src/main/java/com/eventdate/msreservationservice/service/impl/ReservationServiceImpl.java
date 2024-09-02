@@ -131,7 +131,6 @@ public class ReservationServiceImpl implements ReservationService {
     private TicketInfo createTicketInfo(Reservation reservation, EventInfo eventInfo) {
         return new TicketInfo(
                 reservation.getId(),
-                eventInfo.id(),
                 eventInfo.name(),
                 eventInfo.eventDate(),
                 eventInfo.startTime(),
