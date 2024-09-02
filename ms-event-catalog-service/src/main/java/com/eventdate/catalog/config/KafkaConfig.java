@@ -1,6 +1,6 @@
 package com.eventdate.catalog.config;
 
-import com.eventdate.catalog.model.record.ReservationPending;
+import com.eventdate.catalog.model.dto.ReservationPending;
 import lombok.AllArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
